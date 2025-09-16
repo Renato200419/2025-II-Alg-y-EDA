@@ -1,6 +1,6 @@
 #ifndef __VECTOR_H__
 #define __VECTOR_H__
-
+#include <iostream> 
 // PC1: deben hacer:
 //      2 problemas de nivel 2
 //      3 problemas de nivel 1
@@ -131,4 +131,16 @@ void CVector<T>::insert(const T &elem){
     m_pVect[m_count++] = elem;
 }
 
+
+// Operador << (Nivel 2) - IMPLEMENTACIÓN
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const CVector<T>& vec) {
+    os << "[";
+    for (size_t i = 0; i < vec.size(); ++i) {
+        if (i > 0) os << ", ";
+        os << vec[i];
+    }
+    os << "]";
+    return os; //devolver el flujo para encadenar <<
+}
 #endif // __VECTOR_H__
