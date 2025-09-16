@@ -21,7 +21,7 @@ class CVector{
     size_t  m_max   = 0; // Max capacity
 public:
     // TODO  (Nivel 1) Agregar un constructor por copia
-    CVector(CVector &v);
+    CVector(const CVector &v); // Constructor por copia  
 
     CVector(size_t n);
     // TODO  (Nivel 2): Agregar un move constructor
@@ -36,6 +36,29 @@ public:
 template <typename T>
 CVector<T>::CVector(size_t n){
 
+}
+
+// Constructor por copia - IMPLEMENTACIÓN (Nivel 1)
+template <typename T>
+CVector<T>::CVector(const CVector &v) {
+    if (v.m_pVect == nullptr || v.m_max == 0) {
+        // Inicializar como vector vacío válido
+        m_pVect = nullptr;
+        m_count = 0;
+        m_max = 0;
+    } else {
+        // Copiar metadatos del objeto fuente
+        m_count = v.m_count;
+        m_max = v.m_max;
+
+        // Reservar nueva memoria
+        m_pVect = new T[m_max];
+        
+        // Copiar solo los elementos válidos
+        for (size_t i = 0; i < m_count; ++i) {
+            m_pVect[i] = v.m_pVect[i];
+        }
+    }
 }
 
 // TODO (Nivel 1): hacer dinamico el delta de crecimiento
