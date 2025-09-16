@@ -29,14 +29,37 @@ public:
 
     // TODO: (Nivel 1) implementar el destructor de forma segura
     virtual ~CVector();    // Destructor seguro (Nivel 1) - IMPLEMENTADO
-    void insert(T &elem);
+    void insert(const T &elem);
     void resize();
+
+    // Operador [] para acceso a elementos (Nivel 1)
+    T& operator[](size_t index);
+    const T& operator[](size_t index) const;
+    size_t size() const { return m_count; }
 };
 
+// Constructor con tamaño inicial
 template <typename T>
-CVector<T>::CVector(size_t n){
-
+CVector<T>::CVector(size_t n) : m_count(0), m_max(n) {
+    if (n > 0) {
+        m_pVect = new T[m_max];
+    }
 }
+
+
+// Operador [] - IMPLEMENTACIÓN (Nivel 1)
+template <typename T>
+T& CVector<T>::operator[](size_t index) {
+    // Acceso directo para modificación
+    return m_pVect[index];
+}
+
+template <typename T>
+const T& CVector<T>::operator[](size_t index) const {
+    // Acceso de solo lectura
+    return m_pVect[index];
+}
+
 
 // Constructor por copia - IMPLEMENTACIÓN (Nivel 1)
 template <typename T>
@@ -102,7 +125,7 @@ void CVector<T>::resize(){
 
 // TODO (ya está hecha): la funcion insert debe permitir que el vector crezca si ha desbordado
 template <typename T>
-void CVector<T>::insert(T &elem){
+void CVector<T>::insert(const T &elem){ 
     if(m_count == m_max)
         resize();
     m_pVect[m_count++] = elem;
