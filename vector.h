@@ -28,7 +28,7 @@ public:
     CVector(CVector &&v);
 
     // TODO: (Nivel 1) implementar el destructor de forma segura
-    vrtual CVector();
+    virtual ~CVector();    // Destructor seguro (Nivel 1) - IMPLEMENTADO
     void insert(T &elem);
     void resize();
 };
@@ -60,6 +60,23 @@ CVector<T>::CVector(const CVector &v) {
         }
     }
 }
+
+// Destructor seguro - IMPLEMENTACIÓN (Nivel 1)
+template <typename T>
+CVector<T>::~CVector() {
+    // Liberamos memoria de forma segura
+    delete[] m_pVect;
+    
+    // Evitar dangling pointer
+    m_pVect = nullptr;
+    
+    // Se resetean el estado del objeto
+    m_count = 0;
+    m_max = 0;
+}
+
+
+
 
 // TODO (Nivel 1): hacer dinamico el delta de crecimiento
 template <typename T>
