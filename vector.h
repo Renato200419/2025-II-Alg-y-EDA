@@ -25,7 +25,7 @@ public:
 
     CVector(size_t n);
     // TODO  (Nivel 2): Agregar un move constructor
-    CVector(CVector &&v);
+    CVector(CVector &&v) noexcept; // Move constructor (Nivel 2) - IMPLEMENTADO - Se usa noexcept para no lanzar excepciones, aplicando buenas prácticas
 
     // TODO: (Nivel 1) implementar el destructor de forma segura
     virtual ~CVector();    // Destructor seguro (Nivel 1) - IMPLEMENTADO
@@ -75,7 +75,18 @@ CVector<T>::~CVector() {
     m_max = 0;
 }
 
-
+// Move constructor - IMPLEMENTACIÓN (Nivel 2)
+template <typename T>
+CVector<T>::CVector(CVector &&v) noexcept 
+    : m_pVect(v.m_pVect),   // mover puntero del otro objeto
+      m_count(v.m_count),   // copiar contador de elementos
+      m_max(v.m_max) {      // copiar capacidad máxima   
+    
+    // Vaciar el objeto fuente manteniéndolo válido
+    v.m_pVect = nullptr;    // dejar fuente sin puntero
+    v.m_count = 0;         // dejar fuente sin elementos
+    v.m_max = 0;          // dejar fuente sin capacidad
+}
 
 
 // TODO (Nivel 1): hacer dinamico el delta de crecimiento
