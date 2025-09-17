@@ -1,41 +1,58 @@
+/**
+ * @file vector.h
+ * @author Renato Olivera  
+ * @brief Vector dinamico con templates y manejo de memoria
+
 #ifndef __VECTOR_H__
 #define __VECTOR_H__
 #include <iostream> 
+
 // PC1: deben hacer:
 //      2 problemas de nivel 2
 //      3 problemas de nivel 1
 // Cada solucion enviarla como un Pull request
 
 // TODO (Nivel 2): Agregar Traits
-
 // TODO (Nivel 2): Agregar Iterators (forward, backward)
-
-// TODO (Nivel 1): Agregar Documentacion para generar con doxygen
-
 // TODO  (Nivel 2): Agregar control de concurrencia en todo el vector
+
+/**
+ * @brief Vector que crece automaticamente cuando se llena
+ * @tparam T tipo de elemento que guarda
+ */
 template <typename T>
 class CVector{
    
-    T      *m_pVect = nullptr;
-    size_t  m_count = 0; // How many elements we have now?
-    size_t  m_max   = 0; // Max capacity
-    double  m_growth_factor = 1.5;  // Factor de crecimiento dinámico
+private:
+    T      *m_pVect = nullptr;     // array dinamico
+    size_t  m_count = 0;          // cuantos elementos hay
+    size_t  m_max   = 0;          // capacidad total
+    double  m_growth_factor = 1.5; // por cuanto se multiplica al crecer
+
 public:
-    // TODO  (Nivel 1) Agregar un constructor por copia
-    CVector(const CVector &v); // Constructor por copia  
+    /** Constructor copia - hace copia completa */
+    CVector(const CVector &v);
 
+    /** Constructor normal - reserva memoria inicial */
     CVector(size_t n);
-    // TODO  (Nivel 2): Agregar un move constructor
-    CVector(CVector &&v) noexcept; // Move constructor (Nivel 2) - IMPLEMENTADO - Se usa noexcept para no lanzar excepciones, aplicando buenas prácticas
 
-    // TODO: (Nivel 1) implementar el destructor de forma segura
-    virtual ~CVector();    // Destructor seguro (Nivel 1) - IMPLEMENTADO
+    /** Move constructor - transfiere ownership */
+    CVector(CVector &&v) noexcept;
+
+    /** Destructor - libera memoria */
+    virtual ~CVector();
+
+    /** Agrega elemento al final */
     void insert(const T &elem);
+
+    /** Aumenta el tamaño del vector */
     void resize();
 
-    // Operador [] para acceso a elementos (Nivel 1)
+    /** Acceso a elementos por indice */
     T& operator[](size_t index);
     const T& operator[](size_t index) const;
+    
+    /** Devuelve numero de elementos */
     size_t size() const { return m_count; }
 };
 
@@ -47,83 +64,69 @@ CVector<T>::CVector(size_t n) : m_count(0), m_max(n), m_growth_factor(1.5) {
     }
 }
 
-
-// Operador [] - IMPLEMENTACIÓN (Nivel 1)
+// Operador [] - permite leer/escribir elementos
 template <typename T>
 T& CVector<T>::operator[](size_t index) {
-    // Acceso directo para modificación
     return m_pVect[index];
 }
 
 template <typename T>
 const T& CVector<T>::operator[](size_t index) const {
-    // Acceso de solo lectura
     return m_pVect[index];
 }
 
-
-// Constructor por copia - IMPLEMENTACIÓN (Nivel 1)
+// Constructor por copia - duplica todo el vector
 template <typename T>
 CVector<T>::CVector(const CVector &v) {
     if (v.m_pVect == nullptr || v.m_max == 0) {
-        // Inicializar como vector vacío válido
         m_pVect = nullptr;
         m_count = 0;
         m_max = 0;
     } else {
-        // Copiar metadatos del objeto fuente
         m_count = v.m_count;
         m_max = v.m_max;
         m_growth_factor = v.m_growth_factor;    
-        // Reservar nueva memoria
         m_pVect = new T[m_max];
         
-        // Copiar solo los elementos válidos
         for (size_t i = 0; i < m_count; ++i) {
             m_pVect[i] = v.m_pVect[i];
         }
     }
 }
 
-// Destructor seguro - IMPLEMENTACIÓN (Nivel 1)
+// Destructor - limpia la memoria
 template <typename T>
 CVector<T>::~CVector() {
-    // Liberamos memoria de forma segura
     delete[] m_pVect;
-    
-    // Evitar dangling pointer
     m_pVect = nullptr;
-    
-    // Se resetean el estado del objeto
     m_count = 0;
     m_max = 0;
 }
 
-// Move constructor - IMPLEMENTACIÓN (Nivel 2)
+// Move constructor - mueve recursos sin copiar
 template <typename T>
 CVector<T>::CVector(CVector &&v) noexcept 
-    : m_pVect(v.m_pVect),   // mover puntero del otro objeto
-      m_count(v.m_count),   // copiar contador de elementos
-      m_max(v.m_max),       // copiar capacidad máxima
-      m_growth_factor(v.m_growth_factor) { // copiar factor de crecimiento  
+    : m_pVect(v.m_pVect),
+      m_count(v.m_count),
+      m_max(v.m_max),
+      m_growth_factor(v.m_growth_factor) {
 
-    // Vaciar el objeto fuente manteniéndolo válido
-    v.m_pVect = nullptr;    // dejar fuente sin puntero
-    v.m_count = 0;         // dejar fuente sin elementos
-    v.m_max = 0;          // dejar fuente sin capacidad
+    // dejar el objeto origen vacio
+    v.m_pVect = nullptr;
+    v.m_count = 0;
+    v.m_max = 0;
 }
 
-
-// TODO (Nivel 1): hacer dinamico el delta de crecimiento
+// Resize - aumenta capacidad cuando se llena
 template <typename T>
 void CVector<T>::resize(){
     size_t new_capacity = static_cast<size_t>(m_max * m_growth_factor);
     if(new_capacity <= m_max) {
-        new_capacity = m_max + 1;  // Garantizar crecimiento mínimo
+        new_capacity = m_max + 1;  // por si el factor da igual
     }
     
     T *pTmp = new T[new_capacity];
-    for(size_t i = 0; i < m_count; ++i) {  // Copiar solo elementos válidos
+    for(size_t i = 0; i < m_count; ++i) {
         pTmp[i] = m_pVect[i];
     }
     delete[] m_pVect;
@@ -131,7 +134,7 @@ void CVector<T>::resize(){
     m_pVect = pTmp;
 }
 
-// TODO (ya está hecha): la funcion insert debe permitir que el vector crezca si ha desbordado
+// Insert - agrega elemento, crece si es necesario
 template <typename T>
 void CVector<T>::insert(const T &elem){ 
     if(m_count == m_max)
@@ -139,8 +142,7 @@ void CVector<T>::insert(const T &elem){
     m_pVect[m_count++] = elem;
 }
 
-
-// Operador << (Nivel 2) - IMPLEMENTACIÓN
+/** Permite imprimir el vector con cout << */
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const CVector<T>& vec) {
     os << "[";
@@ -149,6 +151,6 @@ std::ostream& operator<<(std::ostream& os, const CVector<T>& vec) {
         os << vec[i];
     }
     os << "]";
-    return os; //devolver el flujo para encadenar <<
+    return os;
 }
 #endif // __VECTOR_H__
