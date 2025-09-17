@@ -19,7 +19,6 @@ class CVector{
     T      *m_pVect = nullptr;
     size_t  m_count = 0; // How many elements we have now?
     size_t  m_max   = 0; // Max capacity
-    double  m_growth_factor = 1.5;  // Factor de crecimiento dinámico
 public:
     // TODO  (Nivel 1) Agregar un constructor por copia
     CVector(const CVector &v); // Constructor por copia  
@@ -41,7 +40,7 @@ public:
 
 // Constructor con tamaño inicial
 template <typename T>
-CVector<T>::CVector(size_t n) : m_count(0), m_max(n), m_growth_factor(1.5) {
+CVector<T>::CVector(size_t n) : m_count(0), m_max(n) {
     if (n > 0) {
         m_pVect = new T[m_max];
     }
@@ -74,7 +73,7 @@ CVector<T>::CVector(const CVector &v) {
         // Copiar metadatos del objeto fuente
         m_count = v.m_count;
         m_max = v.m_max;
-        m_growth_factor = v.m_growth_factor;    
+
         // Reservar nueva memoria
         m_pVect = new T[m_max];
         
@@ -104,9 +103,8 @@ template <typename T>
 CVector<T>::CVector(CVector &&v) noexcept 
     : m_pVect(v.m_pVect),   // mover puntero del otro objeto
       m_count(v.m_count),   // copiar contador de elementos
-      m_max(v.m_max),       // copiar capacidad máxima
-      m_growth_factor(v.m_growth_factor) { // copiar factor de crecimiento  
-
+      m_max(v.m_max) {      // copiar capacidad máxima   
+    
     // Vaciar el objeto fuente manteniéndolo válido
     v.m_pVect = nullptr;    // dejar fuente sin puntero
     v.m_count = 0;         // dejar fuente sin elementos
@@ -117,17 +115,11 @@ CVector<T>::CVector(CVector &&v) noexcept
 // TODO (Nivel 1): hacer dinamico el delta de crecimiento
 template <typename T>
 void CVector<T>::resize(){
-    size_t new_capacity = static_cast<size_t>(m_max * m_growth_factor);
-    if(new_capacity <= m_max) {
-        new_capacity = m_max + 1;  // Garantizar crecimiento mínimo
-    }
-    
-    T *pTmp = new T[new_capacity];
-    for(size_t i = 0; i < m_count; ++i) {  // Copiar solo elementos válidos
+    T *pTmp = new T[m_max+10];
+    for(auto i=0; i < m_max ; ++i)
         pTmp[i] = m_pVect[i];
-    }
-    delete[] m_pVect;
-    m_max = new_capacity;
+    delete [] m_pVect;
+    m_max += 10;
     m_pVect = pTmp;
 }
 
